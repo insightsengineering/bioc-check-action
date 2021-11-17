@@ -117,6 +117,20 @@ branding:
 runs:
   using: "composite"
   steps:
+      - name: Set R Library home on Linux
+        if: runner.os == 'Linux'
+        run: |
+          mkdir /__w/_temp/Library
+          echo ".libPaths('/__w/_temp/Library')" > ~/.Rprofile
+
+      - name: Cache R packages
+        if: "!contains(github.event.head_commit.message, '/nocache')"
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/work/_temp/Library
+          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion
+
       - name: Install dependencies
         run: |
           options(repos = c(CRAN = "https://cloud.r-project.org/"))
@@ -135,5 +149,5 @@ runs:
       - name: Run BiocCheck
         run: |
           echo "${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}"
-          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}
         shell: bash

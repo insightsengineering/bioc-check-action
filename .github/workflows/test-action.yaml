@@ -38,13 +38,11 @@ jobs:
           R CMD INSTALL stageddeps.elecinfra_*.tar.gz
           R CMD check stageddeps.elecinfra_*.tar.gz
 
-      - name: Test bioccheck default parameters
+      - name: Test bioccheck action
         uses: ./
         with:
           path: "stageddeps.elecinfra"
-
-      - name: Test bioccheck default parameters
-        uses: ./
-        with:
-          path: "stageddeps.elecinfra"
-          new-package: true
+          no-check-bioc-help: true
+          no-check-man-doc: true
+          no-check-vignettes: true
+          no-check-bioc-views: true

@@ -104,7 +104,6 @@ inputs:
   build-output-file:
     description: ""
     required: false
-    default: false
   quit-with-status:
     description: ""
     required: false
@@ -146,7 +145,32 @@ runs:
       - name: Prepare script options
         run: |
           declare -a options
-          test ${INPUT_NEW_PACKAGE} && options+=(--new-package)
+          test ${NEW_PACKAGE} && options+=(--new-package)
+          test ${NO_CHECK_DEPENDENCIES} && options+=(--no-check-dependencies)
+          test ${NO_CHECK_DEPRECATED} && options+=(--no-check-deprecated)
+          test ${NO_CHECK_REMOTES} && options+=(--no-check-remotes)
+          test ${NO_CHECK_VERSION_NUM} && options+=(--no-check-version-num)
+          test ${NO_CHECK_R_VER} && options+=(--no-check-R-ver)
+          test ${NO_CHECK_PKG_SIZE} && options+=(--no-check-pkg-size)
+          test ${NO_CHECK_FILE_SIZE} && options+=(--no-check-file-size)
+          test ${NO_CHECK_BIOC_VIEWS} && options+=(--no-check-bioc-views)
+          test ${NO_CHECK_BBS} && options+=(--no-check-bbs)
+          test ${NO_CHECK_DESCRIPTION} && options+=(--no-check-description)
+          test ${NO_CHECK_NAMESPACE} && options+=(--no-check-namespace)
+          test ${NO_CHECK_VIGNETTES} && options+=(--no-check-vignettes)
+          test ${NO_CHECK_LIBRARY_CALLS} && options+=(--no-check-library-calls)
+          test ${NO_CHECK_INSTALL_SELF} && options+=(--no-check-install-self)
+          test ${NO_CHECK_CODING_PRACTICES} && options+=(--no-check-coding-practices)
+          test ${NO_CHECK_FUNCTION_LEN} && options+=(--no-check-function-len)
+          test ${NO_CHECK_MAN_DOC} && options+=(--no-check-man-doc)
+          test ${NO_CHECK_NEWS} && options+=(--no-check-news)
+          test ${NO_CHECK_UNIT_TESTS} && options+=(--no-check-unit-tests)
+          test ${NO_CHECK_SKIP_BIOC_TESTS} && options+=(--no-check-skip-bioc-tests)
+          test ${NO_CHECK_FORMATTING} && options+=(--no-check-formatting)
+          test ${NO_CHECK_CRAN} && options+=(--no-check-CRAN)
+          test ${NO_CHECK_BIOC_HELP} && options+=(--no-check-bioc-help)
+          test ${BUILD_OUTPUT_FILE} && options+=(--build-output-file ${BUILD_OUTPUT_FILE})
+          test ${QUIT_WITH_STATUS} && options+=(--quit-with-status)
           echo "BIOC_OPTIONS=${options[@]}" >> $GITHUB_ENV
         shell: bash
 

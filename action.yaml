@@ -145,6 +145,7 @@ runs:
       - name: Prepare script options
         run: |
           declare -a options
+          env
           echo "INPUT_NO_CHECK_BIOC_HELP = $INPUT_NO_CHECK_BIOC_HELP"
           echo 
           test "${INPUT_NEW_PACKAGE}" = "true" && options+=(--new-package)

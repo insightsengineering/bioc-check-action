@@ -122,6 +122,7 @@ runs:
         run: |
           mkdir /__w/_temp/Library
           echo ".libPaths('/__w/_temp/Library')" > ~/.Rprofile
+        shell: bash
 
       - name: Cache R packages
         if: "!contains(github.event.head_commit.message, '/nocache')"

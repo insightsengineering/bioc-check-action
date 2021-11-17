@@ -168,8 +168,8 @@ runs:
           test ${NO_CHECK_SKIP_BIOC_TESTS} && options+=(--no-check-skip-bioc-tests)
           test ${NO_CHECK_FORMATTING} && options+=(--no-check-formatting)
           test ${NO_CHECK_CRAN} && options+=(--no-check-CRAN)
-          test ${NO_CHECK_BIOC_HELP} && options+=(--no-check-bioc-help)
-          test ${BUILD_OUTPUT_FILE} && options+=(--build-output-file ${BUILD_OUTPUT_FILE})
+          test "${NO_CHECK_BIOC_HELP}" = "true" && options+=(--no-check-bioc-help)
+          test -n ${BUILD_OUTPUT_FILE} && options+=(--build-output-file ${BUILD_OUTPUT_FILE})
           test ${QUIT_WITH_STATUS} && options+=(--quit-with-status)
           echo "BIOC_OPTIONS=${options[@]}" >> $GITHUB_ENV
         shell: bash

@@ -152,6 +152,6 @@ runs:
 
       - name: Run BiocCheck
         run: |
-          echo -e "${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
+          echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
           ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}
         shell: bash

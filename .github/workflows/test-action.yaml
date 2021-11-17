@@ -34,7 +34,7 @@ jobs:
 
       - name: Run r cmd check
         run: |
-          R CMD BUILD stageddeps.elecinfra
+          R CMD build stageddeps.elecinfra
           R CMD INSTALL stageddeps.elecinfra_*.tar.gz
           R CMD check stageddeps.elecinfra_*.tar.gz
 

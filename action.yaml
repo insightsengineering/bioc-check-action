@@ -1,5 +1,116 @@
 name: "Staged dependencies action"
 description: "Github Actions to implement R development stages for package development"
+inputs:
+  path:
+    description: Path to package's root
+    required: false
+    default: "."
+  new-package:
+    description: ""
+    required: false
+    default: false
+  no-check-dependencies:
+    description: ""
+    required: false
+    default: false
+  no-check-deprecated:
+    description: ""
+    required: false
+    default: false
+  no-check-remotes:
+    description: ""
+    required: false
+    default: false
+  no-check-version-num:
+    description: ""
+    required: false
+    default: false
+  no-check-R-ver:
+    description: ""
+    required: false
+    default: false
+  no-check-pkg-size:
+    description: ""
+    required: false
+    default: false
+  no-check-file-size:
+    description: ""
+    required: false
+    default: false
+  no-check-bioc-views:
+    description: ""
+    required: false
+    default: false
+  no-check-bbs:
+    description: ""
+    required: false
+    default: false
+  no-check-description:
+    description: ""
+    required: false
+    default: false
+  no-check-namespace:
+    description: ""
+    required: false
+    default: false
+  no-check-vignettes:
+    description: ""
+    required: false
+    default: false
+  no-check-library-calls:
+    description: ""
+    required: false
+    default: false
+  no-check-install-self:
+    description: ""
+    required: false
+    default: false
+  no-check-coding-practices:
+    description: ""
+    required: false
+    default: false
+  no-check-function-len:
+    description: ""
+    required: false
+    default: false
+  no-check-man-doc:
+    description: ""
+    required: false
+    default: false
+  no-check-news:
+    description: ""
+    required: false
+    default: false
+  no-check-unit-tests:
+    description: ""
+    required: false
+    default: false
+  no-check-skip-bioc-tests:
+    description: ""
+    required: false
+    default: false
+  no-check-formatting:
+    description: ""
+    required: false
+    default: false
+  no-check-CRAN:
+    description: ""
+    required: false
+    default: false
+  no-check-bioc-help:
+    description: ""
+    required: false
+    default: false
+  build-output-file:
+    description: ""
+    required: false
+    default: false
+  quit-with-status:
+    description: ""
+    required: false
+    default: false
+
+
 branding:
   icon: 'arrow-down'
   color: 'blue'
@@ -11,9 +122,16 @@ runs:
           options(repos = c(CRAN = "https://cloud.r-project.org/"))
           ncores <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
           if (!require("BiocManager")) install.packages("BiocManager", upgrade = "never", Ncpus = ncores)
-          BiocManager::install("BiocCheck")
+          BiocManager::install("BiocCheck", update = FALSE, ask = FALSE)
         shell: Rscript {0}
 
+      - name: Prepare script options
+        run: |
+          declare -a options
+          test ${INPUT_NEW_PACKAGE} && options+=(--new-package)
+          echo "BIOC_OPTIONS=${options[@]}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Run BiocCheck
-        run: R CMD BiocCheck ${REPO_PATH}
-        shell: sh
+        run: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}
+        shell: bash

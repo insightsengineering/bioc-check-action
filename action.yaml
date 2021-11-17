@@ -133,5 +133,7 @@ runs:
         shell: bash
 
       - name: Run BiocCheck
-        run: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}
+        run: |
+          echo "${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}"
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}
         shell: bash

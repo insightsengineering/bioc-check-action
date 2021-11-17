@@ -22,8 +22,16 @@ jobs:
         image: ["rocker/verse"]
         tag: ["4.1.0", "4.0.3", "3.6.3"]
     steps:
+
       - name: Checkout repo
         uses: actions/checkout@v2
+
+      - name: Checkout test repo
+        uses: actions/checkout@v2
+        with:
+          repository: "openpharma/stageddeps.elecinfra"
+          path: "stageddeps.elecinfra"
+
 
       - name: Test bioccheck default parameters
         uses: ./

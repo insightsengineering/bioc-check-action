@@ -132,8 +132,8 @@ runs:
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library
-          key: ${{ input.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ input.cache-version }}-${{ runner.os }}-biocversion
+          key: ${{ inputs.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-biocversion
 
       - name: Install dependencies
         run: |

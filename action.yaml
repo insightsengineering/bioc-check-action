@@ -1,0 +1,19 @@
+name: "Staged dependencies action"
+description: "Github Actions to implement R development stages for package development"
+branding:
+  icon: 'arrow-down'
+  color: 'blue'
+runs:
+  using: "composite"
+  steps:
+      - name: Install dependencies
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org/"))
+          ncores <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
+          if (!require("BiocManager")) install.packages("BiocManager", upgrade = "never", Ncpus = ncores)
+          BiocManager::install("BiocCheck")
+        shell: Rscript {0}
+
+      - name: Run BiocCheck
+        run: R CMD BiocCheck ${REPO_PATH}
+        shell: sh

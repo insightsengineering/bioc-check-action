@@ -145,6 +145,8 @@ runs:
       - name: Prepare script options
         run: |
           declare -a options
+          echo "INPUT_NO_CHECK_BIOC_HELP = $INPUT_NO_CHECK_BIOC_HELP"
+          echo 
           test "${INPUT_NEW_PACKAGE}" = "true" && options+=(--new-package)
           test "${INPUT_NO_CHECK_DEPENDENCIES}" = "true" && options+=(--no-check-dependencies)
           test "${INPUT_NO_CHECK_DEPRECATED}" = "true" && options+=(--no-check-deprecated)

@@ -109,7 +109,10 @@ inputs:
     description: ""
     required: false
     default: false
-
+  cache-version:
+    description: ""
+    required: false
+    default: "cache-v1"
 
 branding:
   icon: 'arrow-down'
@@ -129,8 +132,8 @@ runs:
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library
-          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion
+          key: ${{ input.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ input.cache-version }}-${{ runner.os }}-biocversion
 
       - name: Install dependencies
         run: |
@@ -149,6 +152,6 @@ runs:
 
       - name: Run BiocCheck
         run: |
-          echo "${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${REPO_PATH}"
+          echo -e "${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
           ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}
         shell: bash

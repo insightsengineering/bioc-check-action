@@ -121,7 +121,7 @@ runs:
   steps:
       - name: Get R version
         id: r_version
-        run: echo "::set-output name=R_VERSION::${R --version | head -1 | awk '{print $3}'}"
+        run: echo "::set-output name=R_VERSION::$(R --version | head -1 | awk '{print $3}')"
         shell: bash
 
       - name: Set R Library home on Linux

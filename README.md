@@ -1,8 +1,7 @@
 # BiocCheck action 
 
 ## Description
-Github Actions to implement R development stages for package development
-
+Github Actions to implement Bioconductor-specific R package checks with BiocCheck.
 
 ## Action Type
 Composite

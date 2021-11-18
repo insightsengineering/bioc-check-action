@@ -182,14 +182,10 @@ runs:
         id: bioccheck
         run: |
           echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
-          OUTPUT=$(${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }})
-          echo "::set-output name=result::$OUTPUT"
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt
         shell: bash
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: BiocCheck
-          message: |
-            ```
-            ${{ steps.bioccheck.outputs.result }}
-            ```
+          path: bioccheck_result.txt

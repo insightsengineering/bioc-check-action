@@ -1,0 +1,195 @@
+name: "BiocCheck action"
+description: "Github Actions to implement R development stages for package development"
+inputs:
+  path:
+    description: Path to package's root
+    required: false
+    default: "."
+  new-package:
+    description: "enable checks specific to new packages"
+    required: false
+    default: false
+  no-check-dependencies:
+    description: "disable check for bad dependencies"
+    required: false
+    default: false
+  no-check-deprecated:
+    description: "disable check for usage of deprecated packages"
+    required: false
+    default: false
+  no-check-remotes:
+    description: "disable check for usage of remote packages other than those hosted on CRAN or Bioconductor"
+    required: false
+    default: false
+  no-check-version-num:
+    description: "disable check for valid version number"
+    required: false
+    default: false
+  no-check-R-ver:
+    description: "disable check for valid R version"
+    required: false
+    default: false
+  no-check-pkg-size:
+    description: "disable check for package tarball size"
+    required: false
+    default: false
+  no-check-file-size:
+    description: "disable check for individual file size"
+    required: false
+    default: false
+  no-check-bioc-views:
+    description: "disable biocViews-specific checks (for non-BioC packages)"
+    required: false
+    default: false
+  no-check-bbs:
+    description: "disable BBS-specific checks (for non-BioC packages). Valid DESCRIPTION"
+    required: false
+    default: false
+  no-check-description:
+    description: "disable DESCRIPTION file checks"
+    required: false
+    default: false
+  no-check-namespace:
+    description: "disable namespace checks"
+    required: false
+    default: false
+  no-check-vignettes:
+    description: "disable vignette checks"
+    required: false
+    default: false
+  no-check-library-calls:
+    description: "disable check usage of functions that install or update packages"
+    required: false
+    default: false
+  no-check-install-self:
+    description: "disable check for require or library of itself"
+    required: false
+    default: false
+  no-check-coding-practices:
+    description: "disable check for some common best coding practices"
+    required: false
+    default: false
+  no-check-function-len:
+    description: "disable check for function length"
+    required: false
+    default: false
+  no-check-man-doc:
+    description: "disable checks for man page documentation"
+    required: false
+    default: false
+  no-check-news:
+    description: "disable checks for NEWS file"
+    required: false
+    default: false
+  no-check-unit-tests:
+    description: "disable checks for unit tests"
+    required: false
+    default: false
+  no-check-skip-bioc-tests:
+    description: "disable check for tests that skip when on bioc"
+    required: false
+    default: false
+  no-check-formatting:
+    description: "disable checks for file formatting"
+    required: false
+    default: false
+  no-check-CRAN:
+    description: "disable check for if package exists in CRAN"
+    required: false
+    default: false
+  no-check-bioc-help:
+    description: "disable check for registration on Bioconductor mailing list and support site"
+    required: false
+    default: false
+  build-output-file:
+    description: "file containing R CMD build output, for additional analysis"
+    required: false
+  quit-with-status:
+    description: "enable exit code option when performing check"
+    required: false
+    default: false
+  no-cache:
+    description: "disable github action R dependency caching"
+    required: false
+    default: false
+  cache-version:
+    description: "version of cache. To clean cache bump this version."
+    required: false
+    default: "cache-v1"
+
+branding:
+  icon: 'arrow-down'
+  color: 'blue'
+runs:
+  using: "composite"
+  steps:
+      - name: Get R version
+        id: r_version
+        run: echo "::set-output name=R_VERSION::$(R --version | head -1 | awk '{print $3}')"
+        shell: bash
+
+      - name: Set R Library home on Linux
+        run: |
+          mkdir -p /__w/_temp/Library
+          echo ".libPaths(c('/__w/_temp/Library', .libPaths()))" > ~/.Rprofile
+        shell: bash 
+
+      - name: Cache R packages
+        if: "contains(inputs.no-cache, 'false')"
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/work/_temp/Library
+          key: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org/"))
+          ncores <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
+          if (!require("BiocManager")) install.packages("BiocManager", upgrade = "never", Ncpus = ncores)
+          BiocManager::install("BiocCheck", update = FALSE, ask = FALSE)
+        shell: Rscript {0}
+
+      - name: Prepare script options
+        run: |
+          declare -a options
+          test "${{ inputs.new-package }}" = "true" && options+=(--new-package)
+          test "${{ inputs.no-check-dependencies }}" = "true" && options+=(--no-check-dependencies)
+          test "${{ inputs.no-check-deprecated }}" = "true" && options+=(--no-check-deprecated)
+          test "${{ inputs.no-check-remotes }}" = "true" && options+=(--no-check-remotes)
+          test "${{ inputs.no-check-version-num }}" = "true" && options+=(--no-check-version-num)
+          test "${{ inputs.no-check-R-ver }}" = "true" && options+=(--no-check-R-ver)
+          test "${{ inputs.no-check-pkg-size }}" = "true" && options+=(--no-check-pkg-size)
+          test "${{ inputs.no-check-file-size }}" = "true" && options+=(--no-check-file-size)
+          test "${{ inputs.no-check-bioc-views }}" = "true" && options+=(--no-check-bioc-views)
+          test "${{ inputs.no-check-bbs }}" = "true" && options+=(--no-check-bbs)
+          test "${{ inputs.no-check-description }}" = "true" && options+=(--no-check-description)
+          test "${{ inputs.no-check-namespace }}" = "true" && options+=(--no-check-namespace)
+          test "${{ inputs.no-check-vignettes }}" = "true" && options+=(--no-check-vignettes)
+          test "${{ inputs.no-check-library-calls }}" = "true" && options+=(--no-check-library-calls)
+          test "${{ inputs.no-check-install-self }}" = "true" && options+=(--no-check-install-self)
+          test "${{ inputs.no-check-coding-practices }}" = "true" && options+=(--no-check-coding-practices)
+          test "${{ inputs.no-check-function-len }}" = "true" && options+=(--no-check-function-len)
+          test "${{ inputs.no-check-man-doc }}" = "true" && options+=(--no-check-man-doc)
+          test "${{ inputs.no-check-news }}" = "true" && options+=(--no-check-news)
+          test "${{ inputs.no-check-unit-tests }}" = "true" && options+=(--no-check-unit-tests)
+          test "${{ inputs.no-check-skip-bioc-tests }}" = "true" && options+=(--no-check-skip-bioc-tests)
+          test "${{ inputs.no-check-formatting }}" = "true" && options+=(--no-check-formatting)
+          test "${{ inputs.no-check-CRAN }}" = "true" && options+=(--no-check-CRAN)
+          test "${{ inputs.no-check-bioc-help }}" = "true" && options+=(--no-check-bioc-help)
+          test "${{ inputs.build-output-file }}x" = "x" || options+=(--build-output-file ${{ inputs.build-output-file }})
+          test "${{ inputs.quit-with-status }}" = "true" && options+=(--quit-with-status)
+          echo "BIOC_OPTIONS=${options[@]}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Run BiocCheck
+        id: bioccheck
+        run: |
+          echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt
+        shell: bash
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: BiocCheck
+          path: bioccheck_result.txt

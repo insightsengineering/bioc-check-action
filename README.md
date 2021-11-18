@@ -1,4 +1,4 @@
-# BiocCheck action action
+# BiocCheck action 
 
 ## Description
 Github Actions to implement R development stages for package development

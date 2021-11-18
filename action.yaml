@@ -119,6 +119,11 @@ branding:
 runs:
   using: "composite"
   steps:
+      - name: Get R version
+        id: r_version
+        run: echo "::set-output name=R_VERSION::${R --version | head -1 | awk '{print $3}'}"
+        shell: bash
+
       - name: Set R Library home on Linux
         run: |
           mkdir -p /__w/_temp/Library
@@ -130,8 +135,8 @@ runs:
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library
-          key: ${{ inputs.cache-version }}-${{ runner.os }}-biocversion-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-biocversion
+          key: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}
 
       - name: Install dependencies
         run: |

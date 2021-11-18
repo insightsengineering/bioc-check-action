@@ -1,5 +1,5 @@
 ---
-name: Staged dependencies action test
+name: BiocCheck action test
 
 on:
   push:

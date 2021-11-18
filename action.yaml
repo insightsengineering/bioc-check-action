@@ -1,4 +1,4 @@
-name: "Staged dependencies action"
+name: "BiocCheck action"
 description: "Github Actions to implement R development stages for package development"
 inputs:
   path:
@@ -117,7 +117,6 @@ inputs:
     required: false
     default: "cache-v1"
 
-
 branding:
   icon: 'arrow-down'
   color: 'blue'
@@ -136,7 +135,7 @@ runs:
         shell: bash 
 
       - name: Cache R packages
-        if: "!contains(github.event.head_commit.message, '[nocache]') || !inputs.no-cache"
+        if: ${{ !contains(github.event.head_commit.message, '[nocache]') || contains(inputs.no-cache, 'true') }}
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library

@@ -270,7 +270,7 @@ jobs:
 
 * `cache-version`:
 
-  _Description_: version of cache. To clean cache bump this version. Default [cache-v1]
+  _Description_: version of cache. To clean cache bump this version
 
   _Required_: `false`
 

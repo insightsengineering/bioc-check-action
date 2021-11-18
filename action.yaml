@@ -113,7 +113,7 @@ inputs:
     required: false
     default: false
   cache-version:
-    description: "version of cache. To clean cache bump this version. Default [cache-v1]"
+    description: "version of cache. To clean cache bump this version."
     required: false
     default: "cache-v1"
 

@@ -6,112 +6,117 @@ inputs:
     required: false
     default: "."
   new-package:
-    description: ""
+    description: "enable checks specific to new packages"
     required: false
     default: false
   no-check-dependencies:
-    description: ""
+    description: "disable check for bad dependencies"
     required: false
     default: false
   no-check-deprecated:
-    description: ""
+    description: "disable check for usage of deprecated packages"
     required: false
     default: false
   no-check-remotes:
-    description: ""
+    description: "disable check for usage of remote packages other than those hosted on CRAN or Bioconductor"
     required: false
     default: false
   no-check-version-num:
-    description: ""
+    description: "disable check for valid version number"
     required: false
     default: false
   no-check-R-ver:
-    description: ""
+    description: "disable check for valid R version"
     required: false
     default: false
   no-check-pkg-size:
-    description: ""
+    description: "disable check for package tarball size"
     required: false
     default: false
   no-check-file-size:
-    description: ""
+    description: "disable check for individual file size"
     required: false
     default: false
   no-check-bioc-views:
-    description: ""
+    description: "disable biocViews-specific checks (for non-BioC packages)"
     required: false
     default: false
   no-check-bbs:
-    description: ""
+    description: "disable BBS-specific checks (for non-BioC packages). Valid DESCRIPTION"
     required: false
     default: false
   no-check-description:
-    description: ""
+    description: "disable DESCRIPTION file checks"
     required: false
     default: false
   no-check-namespace:
-    description: ""
+    description: "disable namespace checks"
     required: false
     default: false
   no-check-vignettes:
-    description: ""
+    description: "disable vignette checks"
     required: false
     default: false
   no-check-library-calls:
-    description: ""
+    description: "disable check usage of functions that install or update packages"
     required: false
     default: false
   no-check-install-self:
-    description: ""
+    description: "disable check for require or library of itself"
     required: false
     default: false
   no-check-coding-practices:
-    description: ""
+    description: "disable check for some common best coding practices"
     required: false
     default: false
   no-check-function-len:
-    description: ""
+    description: "disable check for function length"
     required: false
     default: false
   no-check-man-doc:
-    description: ""
+    description: "disable checks for man page documentation"
     required: false
     default: false
   no-check-news:
-    description: ""
+    description: "disable checks for NEWS file"
     required: false
     default: false
   no-check-unit-tests:
-    description: ""
+    description: "disable checks for unit tests"
     required: false
     default: false
   no-check-skip-bioc-tests:
-    description: ""
+    description: "disable check for tests that skip when on bioc"
     required: false
     default: false
   no-check-formatting:
-    description: ""
+    description: "disable checks for file formatting"
     required: false
     default: false
   no-check-CRAN:
-    description: ""
+    description: "disable check for if package exists in CRAN"
     required: false
     default: false
   no-check-bioc-help:
-    description: ""
+    description: "disable check for registration on Bioconductor mailing list and support site"
     required: false
     default: false
   build-output-file:
-    description: ""
+    description: "file containing R CMD build output, for additional analysis"
     required: false
   quit-with-status:
-    description: ""
+    description: "enable exit code option when performing check"
+    required: false
+    default: false
+  no-cache:
+    description: "disable github action R dependency caching"
     required: false
     default: false
   cache-version:
-    description: ""
+    description: "version of cache. To clean cache bump this version. Default [cache-v1]"
     required: false
     default: "cache-v1"
+
 
 branding:
   icon: 'arrow-down'
@@ -131,7 +136,7 @@ runs:
         shell: bash 
 
       - name: Cache R packages
-        if: "!contains(github.event.head_commit.message, '[nocache]')"
+        if: "!contains(github.event.head_commit.message, '[nocache]') || !inputs.no-cache"
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library

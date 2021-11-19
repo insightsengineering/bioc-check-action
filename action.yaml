@@ -183,13 +183,17 @@ runs:
         shell: bash
 
       - name: Run BiocCheck
-        id: bioccheck
         run: |
           echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
-          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt || echo "" > .bioccheck_fail
         shell: bash
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: BiocCheck
           path: bioccheck_result.txt
+
+      - name: Check bioccheck status
+        run: |
+          test -f ".bioccheck_fail" && (echo "❌ BiocCheck has errors"; exit 1) || echo "💚 BiocCheck status OK"
+        shell: bash

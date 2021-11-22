@@ -209,5 +209,10 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          test -f ".bioccheck_fail" && (echo "❌ BiocCheck has errors"; exit 1) || echo "💚 BiocCheck status OK"
+          if test -f ".bioccheck_fail"; then
+            echo "❌ BiocCheck has errors"
+            exit 1
+          else
+            echo "💚 BiocCheck status OK"
+          fi
         shell: bash

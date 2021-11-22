@@ -196,9 +196,9 @@ runs:
           sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |head -n -1 >> bioccheck_result_formatted.txt
           echo "</details>" >> bioccheck_result_formatted.txt
           echo  -e "\n### Summary:\n" >> bioccheck_result_formatted.txt
-          echo "```"  >> bioccheck_result_formatted.txt
+          echo '```'  >> bioccheck_result_formatted.txt
           grep -A 3 "^Summary:$" bioccheck_result.txt | grep -v Summary >> bioccheck_result_formatted.txt
-          echo "```" >> bioccheck_result_formatted.txt
+          echo -e '```\n' >> bioccheck_result_formatted.txt
           grep -v "BiocCheck FAILED" bioccheck_result.txt | tail -3 >> bioccheck_result_formatted.txt
         shell: bash
 

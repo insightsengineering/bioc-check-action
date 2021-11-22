@@ -188,10 +188,24 @@ runs:
           ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt || echo "" > .bioccheck_fail
         shell: bash
 
+      - name: Format output
+        run: |
+          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
+          head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
+          echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
+          sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |grep -v "^Summary:$" >> bioccheck_result_formatted.txt
+          echo "</details>" >> bioccheck_result_formatted.txt
+          echo  -e "\n### Summary:\n" >> bioccheck_result_formatted.txt
+          echo '```'  >> bioccheck_result_formatted.txt
+          grep -A 3 "^Summary:$" bioccheck_result.txt | grep -v Summary >> bioccheck_result_formatted.txt
+          echo -e '```\n' >> bioccheck_result_formatted.txt
+          grep -v "BiocCheck FAILED" bioccheck_result.txt | tail -3 >> bioccheck_result_formatted.txt
+        shell: bash
+
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: BiocCheck
-          path: bioccheck_result.txt
+          path: bioccheck_result_formatted.txt
 
       - name: Check bioccheck status
         run: |

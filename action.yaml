@@ -209,7 +209,7 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          if test -f ".bioccheck_fail"; then
+          if [[ -f ".bioccheck_fail" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
           else

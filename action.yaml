@@ -190,7 +190,7 @@ runs:
 
       - name: Format output
         run: |
-          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt"
+          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
           head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
           echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
           sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |head -n -1 >> bioccheck_result_formatted.txt

@@ -61,6 +61,14 @@ jobs:
 
   _Default_: `false`
 
+* `post-result-as-comment`:
+
+  _Description_: post the check result as a PR comment
+
+  _Required_: `false`
+
+  _Default_: `true`
+
 * `no-check-dependencies`:
 
   _Description_: disable check for bad dependencies

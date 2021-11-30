@@ -3,12 +3,11 @@ name: BiocCheck action test no cache
 
 on:
   push:
-    tags:
-      - "v*"
     branches:
       - main
-      - pre-release
   pull_request:
+    branches:
+      - main
 
 jobs:
   smoke-test:

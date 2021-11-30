@@ -200,12 +200,14 @@ runs:
             (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
           head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
           echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
+          echo '```'  >> bioccheck_result_formatted.txt
           sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |grep -v "^Summary:$" >> bioccheck_result_formatted.txt
+          echo '```'  >> bioccheck_result_formatted.txt
           echo "</details>" >> bioccheck_result_formatted.txt
           echo  -e "\n### Summary:\n" >> bioccheck_result_formatted.txt
           echo '```'  >> bioccheck_result_formatted.txt
           grep -A 3 "^Summary:$" bioccheck_result.txt | grep -v Summary >> bioccheck_result_formatted.txt
-          echo -e '```\n' >> bioccheck_result_formatted.txt
+          echo '```' >> bioccheck_result_formatted.txt
           grep -v "BiocCheck FAILED" bioccheck_result.txt | tail -3 >> bioccheck_result_formatted.txt
         shell: bash
 

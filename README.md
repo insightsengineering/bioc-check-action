@@ -1,5 +1,8 @@
 # BiocCheck action 
 
+[![BiocCheck action test](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml)
+[![BiocCheck action test no cache](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml)
+[![SuperLinter](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml)
 ## Description
 Github Actions to implement Bioconductor-specific R package checks with BiocCheck.
 

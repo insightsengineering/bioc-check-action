@@ -139,7 +139,7 @@ runs:
         shell: bash 
 
       - name: Cache R packages
-        if: "!inputs.no-cache"
+        if: "contains(inputs.no-cache, 'false')"
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library

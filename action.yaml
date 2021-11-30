@@ -9,6 +9,10 @@ inputs:
     description: "enable checks specific to new packages"
     required: false
     default: false
+  post-result-as-comment:
+    description: "post the check result as a PR comment"
+    required: false
+    default: true
   no-check-dependencies:
     description: "disable check for bad dependencies"
     required: false
@@ -118,8 +122,8 @@ inputs:
     default: "cache-v1"
 
 branding:
-  icon: 'arrow-down'
-  color: 'blue'
+  icon: "arrow-down"
+  color: "blue"
 runs:
   using: "composite"
   steps:
@@ -135,7 +139,7 @@ runs:
         shell: bash 
 
       - name: Cache R packages
-        if: "contains(inputs.no-cache, 'false')"
+        if: "!inputs.no-cache"
         uses: actions/cache@v2
         with:
           path: /home/runner/work/_temp/Library
@@ -185,12 +189,15 @@ runs:
       - name: Run BiocCheck
         run: |
           echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
-          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 |tee bioccheck_result.txt || echo "" > .bioccheck_fail
+          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
+            tee bioccheck_result.txt || echo "" > .bioccheck_fail
         shell: bash
 
       - name: Format output
+        if: inputs.post-result-as-comment
         run: |
-          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
+          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || \
+            (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
           head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
           echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
           sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |grep -v "^Summary:$" >> bioccheck_result_formatted.txt
@@ -203,6 +210,7 @@ runs:
         shell: bash
 
       - uses: marocchino/sticky-pull-request-comment@v2
+        if: inputs.post-result-as-comment
         with:
           header: BiocCheck
           path: bioccheck_result_formatted.txt

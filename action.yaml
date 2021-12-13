@@ -141,7 +141,7 @@ runs:
         run: |
           mkdir -p /__w/_temp/Library
           echo ".libPaths(c('/__w/_temp/Library', .libPaths()))" > ~/.Rprofile
-        shell: bash 
+        shell: bash
 
       - name: Cache R packages
         if: "contains(inputs.no-cache, 'false')"
@@ -224,7 +224,7 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          if [[ -f ".bioccheck_fail"]]  || [[ "${allow_failure}" == "false" ]]; then
+          if [[ -f ".bioccheck_fail"]]  && [[ "${{ inputs.allow_failure }}" == "false" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
           else

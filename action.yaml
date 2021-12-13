@@ -228,7 +228,7 @@ runs:
             echo "❌ BiocCheck has errors"
             exit 1
           elif  [[ -f ".bioccheck_fail" ]]; then
-             echo "⚠️ BiocCheck status WARNING"
+             echo "⚠️ BiocCheck produced WARNINGs"
           else
             echo "💚 BiocCheck status OK"
           fi

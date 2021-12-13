@@ -285,3 +285,11 @@ jobs:
   _Required_: `false`
 
   _Default_: `cache-v1`
+
+* `allow-failure`:
+
+  _Description_: BiocCheck errors will not fail, but will give a warning
+
+  _Required_: `false`
+
+  _Default_: `false`

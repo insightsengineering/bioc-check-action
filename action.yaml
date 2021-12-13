@@ -120,7 +120,7 @@ inputs:
     description: "version of cache. To clean cache bump this version."
     required: false
     default: "cache-v1"
-  allow_failure:
+  allow-failure:
     description: BiocCheck errors will not fail, but will give a warning.
     required: false
     type: boolean

@@ -224,7 +224,7 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow_failure }}" == "false" ]]; then
+          if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow-failure }}" == "false" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
           elif  [[ -f ".bioccheck_fail" ]]; then

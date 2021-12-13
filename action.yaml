@@ -227,6 +227,8 @@ runs:
           if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow_failure }}" == "false" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
+          elif  [[ -f ".bioccheck_fail" ]]; then
+             echo "⚠️ BiocCheck status WARNING"
           else
             echo "💚 BiocCheck status OK"
           fi

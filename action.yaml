@@ -120,6 +120,11 @@ inputs:
     description: "version of cache. To clean cache bump this version."
     required: false
     default: "cache-v1"
+  allow-failure:
+    description: BiocCheck errors will not fail, but will give a warning.
+    required: false
+    type: boolean
+    default: false
 
 branding:
   icon: "arrow-down"
@@ -136,7 +141,7 @@ runs:
         run: |
           mkdir -p /__w/_temp/Library
           echo ".libPaths(c('/__w/_temp/Library', .libPaths()))" > ~/.Rprofile
-        shell: bash 
+        shell: bash
 
       - name: Cache R packages
         if: "contains(inputs.no-cache, 'false')"
@@ -219,9 +224,11 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          if [[ -f ".bioccheck_fail" ]]; then
+          if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow-failure }}" == "false" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
+          elif  [[ -f ".bioccheck_fail" ]]; then
+             echo "⚠️ BiocCheck produced WARNINGs"
           else
             echo "💚 BiocCheck status OK"
           fi

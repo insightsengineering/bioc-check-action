@@ -153,10 +153,26 @@ runs:
 
       - name: Install dependencies
         run: |
-          options(repos = c(CRAN = "https://cloud.r-project.org/"))
           ncores <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
-          if (!require("BiocManager")) install.packages("BiocManager", upgrade = "never", Ncpus = ncores)
-          BiocManager::install("BiocCheck", update = FALSE, ask = FALSE)
+          if (!require("BiocManager")) {
+            install.packages(
+              "BiocManager",
+              upgrade = "never",
+              Ncpus = ncores,
+              repos = "https://cloud.r-project.org/"
+            )
+          }
+          if (!require("optparse")) {
+            install.packages(
+              "optparse",
+              upgrade = "never",
+              Ncpus = ncores,
+              repos = "https://cloud.r-project.org/"
+            )
+          }
+          if (!require("BiocCheck")) {
+            BiocManager::install("BiocCheck", ask = FALSE)
+          }
         shell: Rscript {0}
 
       - name: Prepare script options

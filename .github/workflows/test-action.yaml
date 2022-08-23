@@ -38,6 +38,8 @@ jobs:
           R CMD build ${{ matrix.test-packages }}
           R CMD INSTALL ${{ matrix.test-packages }}_*.tar.gz
           R CMD check ${{ matrix.test-packages }}_*.tar.gz
+        env:
+          _R_CHECK_FORCE_SUGGESTS_: 0
 
       - name: Test BiocCheck Action
         uses: ./

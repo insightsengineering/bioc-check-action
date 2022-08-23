@@ -1,7 +1,6 @@
 # BiocCheck Action
 
-[![BiocCheck action test](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml)
-[![BiocCheck action test no cache](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml)
+[![Action Test](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml)
 [![SuperLinter](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml)
 
 ## Description

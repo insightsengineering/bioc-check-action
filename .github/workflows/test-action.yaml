@@ -12,7 +12,7 @@ on:
 jobs:
   smoke-test:
     runs-on: ubuntu-latest
-    name: "R: ${{ matrix.r-version }}, Package: ${{ matrix.test-packages }}, Cache: ${{ matrix.cache }}"
+    name: "R: ${{ matrix.r-version }}, Package: ${{ matrix.test-packages }}, No Cache: ${{ matrix.cache }}"
     strategy:
       fail-fast: false
       matrix:

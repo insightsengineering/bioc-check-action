@@ -32,14 +32,21 @@ jobs:
     container:
       image: rocker/verse:4.2.1
     steps:
-      - name: Checkout repo
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Run R CMD check
-        run: |
-          R CMD build .
-          R CMD INSTALL *.tar.gz
-          R CMD check *.tar.gz
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          http-user-agent: release
+          use-public-rspm: true
+
+      - name: Install Deps
+        uses: r-lib/actions/setup-r-dependencies@v2
 
       - name: Run BiocCheck
         uses: insightsengineering/bioc-check-action@v1

@@ -159,7 +159,8 @@ runs:
               "BiocManager",
               upgrade = "never",
               Ncpus = ncores,
-              repos = "https://cloud.r-project.org/"
+              repos = "https://cloud.r-project.org/",
+              quiet = TRUE
             )
           }
           if (!require("optparse")) {
@@ -167,11 +168,12 @@ runs:
               "optparse",
               upgrade = "never",
               Ncpus = ncores,
-              repos = "https://cloud.r-project.org/"
+              repos = "https://cloud.r-project.org/",
+              quiet = TRUE
             )
           }
           if (!require("BiocCheck")) {
-            BiocManager::install("BiocCheck", ask = FALSE)
+            BiocManager::install("BiocCheck", ask = FALSE, quiet = TRUE)
           }
         shell: Rscript {0}
 
@@ -209,34 +211,43 @@ runs:
 
       - name: Run BiocCheck
         run: |
-          echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
-          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
-            tee bioccheck_result.txt || echo "" > .bioccheck_fail
+          echo -e "⌛️ Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
+          echo "🔬 ------------------------------------------- 🔬"
+          ${GITHUB_ACTION_PATH}/BiocCheck.R \
+            ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
+            tee result.txt || echo "" > .bioccheck_fail
+          echo "🔬 ------------------------------------------- 🔬"
         shell: bash
 
       - name: Format output
         if: inputs.post-result-as-comment
         run: |
-          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || \
-            (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
-          head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
-          echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |grep -v "^Summary:$" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          echo "</details>" >> bioccheck_result_formatted.txt
-          echo  -e "\n### Summary:\n" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          grep -A 3 "^Summary:$" bioccheck_result.txt | grep -v Summary >> bioccheck_result_formatted.txt
-          echo '```' >> bioccheck_result_formatted.txt
-          grep -v "BiocCheck FAILED" bioccheck_result.txt | tail -3 >> bioccheck_result_formatted.txt
+          test -f ".bioccheck_fail" && \
+            (echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt) || \
+            (echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt)
+          cat > pr-comment.txt <<EOF
+          $(head -2 result.txt)
+
+          <details><summary>Click here to show log</summary>
+          \`\`\`
+          $(cat result.txt)
+          \`\`\`
+          </details>
+          
+          ### Summary
+
+          \`\`\`
+          $(grep -A 1 "BiocCheck results" result.txt | \
+            grep -v "BiocCheck results" | \
+            sed 's/ | /\n/g')
+          \`\`\`
         shell: bash
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: inputs.post-result-as-comment
         with:
           header: BiocCheck
-          path: bioccheck_result_formatted.txt
+          path: pr-comment.txt
 
       - name: Check bioccheck status
         run: |

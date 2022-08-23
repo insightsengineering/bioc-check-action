@@ -139,15 +139,15 @@ runs:
 
       - name: Set R Library home on Linux
         run: |
-          mkdir -p /__w/_temp/Library
-          echo ".libPaths(c('/__w/_temp/Library', .libPaths()))" > ~/.Rprofile
+          mkdir -p ~/_temp/Library
+          echo ".libPaths(c('~/_temp/Library', .libPaths()))" > ~/.Rprofile
         shell: bash
 
       - name: Cache R packages
         if: "contains(inputs.no-cache, 'false')"
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: /home/runner/work/_temp/Library
+          path: ~/_temp/Library
           key: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}
 

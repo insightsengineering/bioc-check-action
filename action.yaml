@@ -224,7 +224,10 @@ runs:
           echo "🔬 ------------------------------------------- 🔬"
           ${GITHUB_ACTION_PATH}/BiocCheck.R \
             ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
-            tee result.txt || echo "" > .bioccheck_fail
+            tee result.txt || echo
+          grep "ERROR:" result.txt > bioccheck-errors
+          grep "NOTE:" result.txt > bioccheck-notes
+          grep "WARNING:" result.txt > bioccheck-warnings
           echo "🔬 ------------------------------------------- 🔬"
         shell: bash
 
@@ -243,9 +246,9 @@ runs:
               sed 's/ | /\n/g')"
           }
           fi
-          test -f ".bioccheck_fail" && \
-            (echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt) || \
-            (echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt)
+          echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt
+          [[ $(cat bioccheck-errors | wc -l) -gt 0 ]] && \
+            echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt
           cat >> pr-comment.txt <<EOF
           ${PR_COMMENT_HEADER}
 
@@ -271,10 +274,10 @@ runs:
 
       - name: Check bioccheck status
         run: |
-          if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow-failure }}" == "false" ]]; then
+          if [[ $(cat bioccheck-errors | wc -l) -gt 0 &&  "${{ inputs.allow-failure }}" == "false" ]]; then
             echo "❌ BiocCheck has errors"
             exit 1
-          elif  [[ -f ".bioccheck_fail" ]]; then
+          elif [[ $(cat bioccheck-errors | wc -l) -gt 0 ]]; then
              echo "⚠️ BiocCheck produced WARNINGs"
           else
             echo "💚 BiocCheck status OK"

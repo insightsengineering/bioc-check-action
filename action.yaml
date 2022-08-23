@@ -261,7 +261,7 @@ runs:
           \`\`\`
           ${PR_COMMENT_SUMMARY}
           \`\`\`
-        shell: bash
+        shell: /usr/bin/bash --noprofile --norc -e {0}
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: inputs.post-result-as-comment

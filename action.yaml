@@ -246,7 +246,7 @@ runs:
           test -f ".bioccheck_fail" && \
             (echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt) || \
             (echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt)
-          cat > pr-comment.txt <<EOF
+          cat >> pr-comment.txt <<EOF
           ${PR_COMMENT_HEADER}
 
           <details><summary>Click here to show log</summary>

@@ -214,7 +214,7 @@ runs:
       - name: Get BiocCheck Version
         id: bioccheck-version
         run: |
-          VERSION=$(R -s -e 'message(packageVersion("BiocCheck"))')
+          VERSION=$(R -s -e 'sink(stdout(), type = "message"); message(packageVersion("BiocCheck"))')
           echo "::set-output name=VERSION::${VERSION}"
         shell: bash
 
@@ -259,9 +259,7 @@ runs:
           ### Summary
 
           \`\`\`
-          $(grep -A 1 "BiocCheck results" result.txt | \
-            grep -v "BiocCheck results" | \
-            sed 's/ | /\n/g')
+          ${PR_COMMENT_SUMMARY}
           \`\`\`
         shell: bash
 

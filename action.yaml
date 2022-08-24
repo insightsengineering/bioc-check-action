@@ -214,7 +214,7 @@ runs:
       - name: Get BiocCheck Version
         id: bioccheck-version
         run: |
-          VERSION=$(R -s -e 'message(as.character(packageVersion("BiocCheck")))')
+          VERSION=$(R -s -e 'sink(stdout(), type = "message"); message(packageVersion("BiocCheck"))')
           echo "::set-output name=VERSION::${VERSION}"
         shell: bash
 

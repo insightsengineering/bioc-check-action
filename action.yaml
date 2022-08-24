@@ -235,9 +235,9 @@ runs:
         if: inputs.post-result-as-comment
         run: |
           PR_COMMENT_HEADER="$(head -2 result.txt)"
-          PR_COMMENT_SUMMARY="$(grep -A 3 "Summary" result.txt | grep -v "Summary")"
+          PR_COMMENT_SUMMARY="$(grep -A 3 'Summary' result.txt | grep -v 'Summary')"
           IS_NEW=$(R -s -e 'message(compareVersion("1.32.0", packageVersion("BiocCheck"))')
-          if [ $IS_NEW -ge 0 ]
+          if [[ $IS_NEW -ge 0 ]]
           then {
             PR_COMMENT_HEADER="$(head -9 result.txt)"
             PR_COMMENT_SUMMARY="$(grep -A 1 "BiocCheck results" result.txt | \
@@ -247,7 +247,7 @@ runs:
           fi
           echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt
           error_count=$(cat bioccheck-errors | wc -l)
-          if [ $error_count -gt 0 ]
+          if [[ $error_count -gt 0 ]]
           then {
             echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt
           }
@@ -279,9 +279,9 @@ runs:
       - name: Check bioccheck status
         run: |
           error_count=$(cat bioccheck-errors | wc -l)
-          if [ $error_count -gt 0 ]
+          if [[ $error_count -gt 0 ]]
           then {
-            if [ "${{ inputs.allow-failure }}" == "false" ]
+            if [[ "${{ inputs.allow-failure }}" == "false" ]]
             then {
               echo "❌ BiocCheck has errors"
               exit 1

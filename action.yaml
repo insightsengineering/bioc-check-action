@@ -270,7 +270,7 @@ runs:
           ${PR_COMMENT_SUMMARY}
           \`\`\`
           EOF
-        shell: /usr/bin/bash --noprofile --norc -e -x {0}
+        shell: /usr/bin/bash --noprofile --norc -e {0}
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: inputs.post-result-as-comment

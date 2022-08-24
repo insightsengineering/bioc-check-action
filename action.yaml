@@ -283,16 +283,14 @@ runs:
           error_count=$(cat bioccheck-errors | wc -l)
           if [[ $error_count -gt 0 ]]
           then {
-            if [[ "${{ inputs.allow-failure }}" == "false" ]]
+            echo "☠️☠️ BiocCheck produced one or more errors ☠️☠️"
+            if [[ "${{ inputs.allow-failure }}" == "true" ]]
             then {
-              echo "❌ BiocCheck has errors"
               exit 1
-            } else {
-              echo "⚠️ BiocCheck produced WARNINGs"
             }
             fi
           } else {
-            echo "💚 No issues with BiocCheck"
+            echo "💚💚 No issues with BiocCheck 💚💚"
           }
           fi
         shell: bash

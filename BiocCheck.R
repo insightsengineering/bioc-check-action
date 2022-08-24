@@ -113,7 +113,7 @@ get_option_list <- function() {
 get_arg_parser <- function() {
   option_list <- get_option_list()
   OptionParser(
-    usage = "R CMD BiocCheck [options] package",
+    usage = "./BiocCheck.R [options] [package path]",
     option_list = option_list
   )
 }
@@ -136,4 +136,9 @@ opt <- arguments$options
 file <- arguments$args
 
 opt$Called_from_command_line <- TRUE # nolint
-BiocCheck(file, opt)
+BiocCheck(
+  package = file,
+  checkDir = dirname(file),
+  debug = FALSE,
+  opt
+)

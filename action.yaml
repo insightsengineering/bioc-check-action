@@ -133,45 +133,49 @@ runs:
   using: "composite"
   steps:
       - name: Get R version
-        id: r_version
+        id: r-version
         run: echo "::set-output name=R_VERSION::$(R --version | head -1 | awk '{print $3}')"
         shell: bash
 
       - name: Set R Library home on Linux
         run: |
-          mkdir -p /__w/_temp/Library
-          echo ".libPaths(c('/__w/_temp/Library', .libPaths()))" > ~/.Rprofile
+          mkdir -p ~/_temp/Library
+          echo ".libPaths(c('~/_temp/Library', .libPaths()))" > ~/.Rprofile
         shell: bash
 
       - name: Cache R packages
         if: "contains(inputs.no-cache, 'false')"
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: /home/runner/work/_temp/Library
-          key: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r_version.outputs.R_VERSION }}
+          path: ~/_temp/Library
+          key: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r-version.outputs.R_VERSION }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.r-version.outputs.R_VERSION }}
 
       - name: Install dependencies
         run: |
           ncores <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
           if (!require("BiocManager")) {
-            install.packages(
+            suppressWarnings(install.packages(
               "BiocManager",
               upgrade = "never",
               Ncpus = ncores,
-              repos = "https://cloud.r-project.org/"
-            )
+              repos = "https://cloud.r-project.org/",
+              quiet = TRUE
+            ))
           }
           if (!require("optparse")) {
-            install.packages(
+            suppressWarnings(install.packages(
               "optparse",
               upgrade = "never",
               Ncpus = ncores,
-              repos = "https://cloud.r-project.org/"
-            )
+              repos = "https://cloud.r-project.org/",
+              quiet = TRUE
+            ))
           }
           if (!require("BiocCheck")) {
-            BiocManager::install("BiocCheck", ask = FALSE)
+            suppressWarnings(
+              BiocManager::install("BiocCheck", ask = FALSE, quiet = TRUE)
+            )
           }
         shell: Rscript {0}
 
@@ -207,45 +211,86 @@ runs:
           echo "BIOC_OPTIONS=${options[@]}" >> $GITHUB_ENV
         shell: bash
 
+      - name: Get BiocCheck Version
+        id: bioccheck-version
+        run: |
+          VERSION=$(R -s -e 'sink(stdout(), type = "message"); message(packageVersion("BiocCheck"))')
+          echo "::set-output name=VERSION::${VERSION}"
+        shell: bash
+
       - name: Run BiocCheck
         run: |
-          echo -e "Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
-          ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
-            tee bioccheck_result.txt || echo "" > .bioccheck_fail
+          echo -e "⌛️ Running: ${GITHUB_ACTION_PATH}/BiocCheck.R ${BIOC_OPTIONS} ${{ inputs.path }}\n\n"
+          echo "🔬 ------------------------------------------- 🔬"
+          ${GITHUB_ACTION_PATH}/BiocCheck.R \
+            ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
+            tee result.txt || echo
+          grep "ERROR:" result.txt > bioccheck-errors
+          grep "NOTE:" result.txt > bioccheck-notes
+          grep "WARNING:" result.txt > bioccheck-warnings
+          echo "🔬 ------------------------------------------- 🔬"
         shell: bash
 
       - name: Format output
         if: inputs.post-result-as-comment
         run: |
-          test -f ".bioccheck_fail" && (echo -e "### BiocCheck FAILED.\n" > bioccheck_result_formatted.txt) || \
-            (echo -e "### BiocCheck PASSED.\n" > bioccheck_result_formatted.txt)
-          head -2 bioccheck_result.txt >> bioccheck_result_formatted.txt
-          echo -e "\n<details>\n  <summary>Click here to show log</summary>\n" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          sed -n '/.*Installing package...$/, /^Summary:$/p' bioccheck_result.txt | tail -n +2 |grep -v "^Summary:$" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          echo "</details>" >> bioccheck_result_formatted.txt
-          echo  -e "\n### Summary:\n" >> bioccheck_result_formatted.txt
-          echo '```'  >> bioccheck_result_formatted.txt
-          grep -A 3 "^Summary:$" bioccheck_result.txt | grep -v Summary >> bioccheck_result_formatted.txt
-          echo '```' >> bioccheck_result_formatted.txt
-          grep -v "BiocCheck FAILED" bioccheck_result.txt | tail -3 >> bioccheck_result_formatted.txt
-        shell: bash
+          IS_NEW=$(R -s -e \
+            'sink(stdout(), type = "message"); message(compareVersion("${{ steps.bioccheck-version.outputs.VERSION }}", "1.32.0"))')
+          if [[ $IS_NEW -ge 0 ]]
+          then {
+            PR_COMMENT_HEADER="$(head -9 result.txt)"
+            PR_COMMENT_SUMMARY="$(grep -A 1 "BiocCheck results" result.txt | \
+              grep -v "BiocCheck results" | \
+              sed 's/ | /\n/g')"
+          } else {
+            PR_COMMENT_HEADER="$(head -2 result.txt)"
+            PR_COMMENT_SUMMARY="$(grep -A 3 Summary result.txt | grep -v Summary)"
+          }
+          fi
+          echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt
+          error_count=$(cat bioccheck-errors | wc -l)
+          if [[ $error_count -gt 0 ]]
+          then {
+            echo -e "### ❌ BiocCheck FAILED.\n" > pr-comment.txt
+          }
+          fi
+          cat >> pr-comment.txt <<EOF
+          ${PR_COMMENT_HEADER}
+
+          <details><summary>Click here to show log</summary>
+
+          \`\`\`
+          $(cat result.txt)
+          \`\`\`
+          </details>
+          
+          ### Summary
+
+          \`\`\`
+          ${PR_COMMENT_SUMMARY}
+          \`\`\`
+          EOF
+        shell: /usr/bin/bash --noprofile --norc -e {0}
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: inputs.post-result-as-comment
         with:
-          header: BiocCheck
-          path: bioccheck_result_formatted.txt
+          header: BiocCheck-${{ steps.r-version.outputs.R_VERSION }}-${{ steps.bioccheck-version.outputs.VERSION }}
+          path: pr-comment.txt
 
       - name: Check bioccheck status
         run: |
-          if [[ -f ".bioccheck_fail"  &&  "${{ inputs.allow-failure }}" == "false" ]]; then
-            echo "❌ BiocCheck has errors"
-            exit 1
-          elif  [[ -f ".bioccheck_fail" ]]; then
-             echo "⚠️ BiocCheck produced WARNINGs"
-          else
-            echo "💚 BiocCheck status OK"
+          error_count=$(cat bioccheck-errors | wc -l)
+          if [[ $error_count -gt 0 ]]
+          then {
+            echo "☠️☠️ BiocCheck produced one or more errors ☠️☠️"
+            if [[ "${{ inputs.allow-failure }}" == "true" ]]
+            then {
+              exit 1
+            }
+            fi
+          } else {
+            echo "💚💚 No issues with BiocCheck 💚💚"
+          }
           fi
         shell: bash

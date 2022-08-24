@@ -1,17 +1,19 @@
-# BiocCheck action 
+# BiocCheck Action
 
-[![BiocCheck action test](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml)
-[![BiocCheck action test no cache](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action-no-cache.yaml)
+[![Action Test](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/test-action.yaml)
 [![SuperLinter](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml/badge.svg)](https://github.com/insightsengineering/bioc-check-action/actions/workflows/linter.yaml)
+
 ## Description
-Github Actions to implement Bioconductor-specific R package checks with BiocCheck.
+
+Github Action that implements Bioconductor-specific R package checks with [BiocCheck](https://bioconductor.org/packages/release/bioc/html/BiocCheck.html).
 
 ## Action Type
+
 Composite
 
 ## Quick Start
 
-1. Create new action file `.github/workflows/bioc-check.yaml` and put example content:
+1. Create a new GitHub Actions workflow file `.github/workflows/bioc-check.yaml` and add the following as content:
 
 ```yaml
 ---
@@ -24,27 +26,47 @@ on:
   pull_request:
 
 jobs:
-  bioc-check:
+  bioccheck:
     runs-on: ubuntu-latest
     name: BiocCheck
-    container:
-      image: rocker/verse:4.1.0
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Run rcmdcheck
-        run: |
-          R CMD build .
-          R CMD INSTALL *.tar.gz
-          R CMD check *.tar.gz
-
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          http-user-agent: release
+          use-public-rspm: true
+      - name: Install Deps
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache: true
       - name: Run BiocCheck
         uses: insightsengineering/bioc-check-action@v1
-
 ```
 
-2. Create PR to test BiocCheck action.
+2. Create a PR against your repository to test and use the action.
+
+## Standalone Usage
+
+Note that you may also use the script from this action in standalone mode by running the following:
+
+```bash
+# Download the script
+wget -O BiocCheck.R \
+  https://raw.githubusercontent.com/insightsengineering/bioc-check-action/main/BiocCheck.R
+# Making the script executable
+chmod +x BiocCheck.R
+# Run the script
+./BiocCheck.R --help
+```
+
+## Example Output
+
+You may view an example output of this action [here](https://github.com/insightsengineering/hermes/pull/166#issuecomment-1016147947).
 
 ## Inputs
 

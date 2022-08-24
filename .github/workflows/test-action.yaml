@@ -54,3 +54,4 @@ jobs:
           no-check-vignettes: true
           no-check-bioc-views: true
           no-cache: ${{ matrix.cache }}
+          allow-failure: false

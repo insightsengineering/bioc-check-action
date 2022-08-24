@@ -235,7 +235,8 @@ runs:
         if: inputs.post-result-as-comment
         run: |
           IS_NEW=$(R -s -e \
-            'message(compareVersion("${{ steps.bioccheck-version.outputs.VERSION }}", "1.32.0"))')
+            'sink(stdout(), type = "message"); \
+            message(compareVersion("${{ steps.bioccheck-version.outputs.VERSION }}", "1.32.0"))')
           if [[ $IS_NEW -lt 0 ]]
           then {
             PR_COMMENT_HEADER="$(head -9 result.txt)"

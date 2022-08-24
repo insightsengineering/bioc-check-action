@@ -236,7 +236,7 @@ runs:
         run: |
           IS_NEW=$(R -s -e \
             'sink(stdout(), type = "message"); message(compareVersion("${{ steps.bioccheck-version.outputs.VERSION }}", "1.32.0"))')
-          if [[ $IS_NEW -lt 0 ]]
+          if [[ $IS_NEW -ge 0 ]]
           then {
             PR_COMMENT_HEADER="$(head -9 result.txt)"
             PR_COMMENT_SUMMARY="$(grep -A 1 "BiocCheck results" result.txt | \
@@ -244,7 +244,7 @@ runs:
               sed 's/ | /\n/g')"
           } else {
             PR_COMMENT_HEADER="$(head -2 result.txt)"
-            PR_COMMENT_SUMMARY="$(grep -A 3 'Summary' result.txt | grep -v 'Summary')"
+            PR_COMMENT_SUMMARY="$(grep -A 3 Summary result.txt | grep -v Summary)"
           }
           fi
           echo -e "### 💚 BiocCheck PASSED.\n" > pr-comment.txt

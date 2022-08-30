@@ -31,7 +31,7 @@ jobs:
     name: BiocCheck
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Setup Pandoc
         uses: r-lib/actions/setup-pandoc@v2
       - name: Setup R

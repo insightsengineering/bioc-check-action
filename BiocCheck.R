@@ -140,5 +140,5 @@ BiocCheck(
   package = file,
   checkDir = dirname(file),
   debug = FALSE,
-  opt
+  ... = opt
 )

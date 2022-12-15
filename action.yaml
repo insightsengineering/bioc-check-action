@@ -134,7 +134,7 @@ runs:
   steps:
       - name: Get R version
         id: r-version
-        run: echo "::set-output name=R_VERSION::$(R --version | head -1 | awk '{print $3}')"
+        run: echo "R_VERSION=$(R --version | head -1 | awk '{print $3}')" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Set R Library home on Linux
@@ -215,7 +215,7 @@ runs:
         id: bioccheck-version
         run: |
           VERSION=$(R -s -e 'sink(stdout(), type = "message"); message(packageVersion("BiocCheck"))')
-          echo "::set-output name=VERSION::${VERSION}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Run BiocCheck
@@ -263,7 +263,7 @@ runs:
           $(cat result.txt)
           \`\`\`
           </details>
-          
+
           ### Summary
 
           \`\`\`

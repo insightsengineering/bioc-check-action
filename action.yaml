@@ -225,9 +225,20 @@ runs:
           ${GITHUB_ACTION_PATH}/BiocCheck.R \
             ${BIOC_OPTIONS} ${{ inputs.path }} 2>&1 | \
             tee result.txt || echo
-          grep "ERROR:" result.txt > bioccheck-errors
-          grep "NOTE:" result.txt > bioccheck-notes
-          grep "WARNING:" result.txt > bioccheck-warnings
+          if grep "ERROR:" result.txt
+          then
+            grep "ERROR:" result.txt > bioccheck-errors
+          else
+            touch bioccheck-errors
+          fi
+          if grep "NOTE:" result.txt
+          then
+            grep "NOTE:" result.txt > bioccheck-notes
+          fi
+          if grep "WARNING:" result.txt
+          then
+            grep "WARNING:" result.txt > bioccheck-warnings
+          fi
           echo "🔬 ------------------------------------------- 🔬"
         shell: bash
 
